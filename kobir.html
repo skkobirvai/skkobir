@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>SK KOBIR VAI - QR</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
+        h1 { color: red; font-size: 50px; }
+        input { padding: 15px; width: 80%; border: 2px solid red; border-radius: 10px; font-size: 18px; }
+        #qrcode { margin-top: 30px; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <h1>SK KOBIR VAI</h1>
+    <input type="text" id="input" placeholder="এখানে লিখুন..." oninput="gen()">
+    <div id="qrcode"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        var q = new QRCode(document.getElementById("qrcode"), { width: 200, height: 200 });
+        function gen() { q.makeCode(document.getElementById("input").value || "SK KOBIR VAI"); }
+        gen();
+    </script>
+</body>
+</html>
