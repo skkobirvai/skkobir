@@ -2,24 +2,73 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>SK KOBIR VAI - QR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK KOBIR VAI - QR PRO</title>
     <style>
-        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
-        h1 { color: red; font-size: 50px; }
-        input { padding: 15px; width: 80%; border: 2px solid red; border-radius: 10px; font-size: 18px; }
-        #qrcode { margin-top: 30px; display: flex; justify-content: center; }
+        body { text-align: center; font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background-color: #f0f0f0; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h1 { color: #ff0000; font-size: 30px; margin-bottom: 20px; }
+        input { padding: 12px; width: 90%; border: 2px solid #ff0000; border-radius: 10px; font-size: 16px; outline: none; margin-bottom: 20px; }
+        #qrcode { display: flex; justify-content: center; margin-bottom: 25px; padding: 10px; background: #fff; }
+        .btn { background: #ff0000; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-    <h1>SK KOBIR VAI</h1>
-    <input type="text" id="input" placeholder="এখানে লিখুন..." oninput="gen()">
-    <div id="qrcode"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
-        var q = new QRCode(document.getElementById("qrcode"), { width: 200, height: 200 });
-        function gen() { q.makeCode(document.getElementById("input").value || "SK KOBIR VAI"); }
-        gen();
-    </script>
-</body>
 
+<div class="container">
+    <h1>SK KOBIR VAI</h1>
+    <input type="text" id="input" placeholder="এখানে নাম বা লিঙ্ক লিখুন..." oninput="gen()">
+    
+    <div id="qrcode"></div>
+
+    <button class="btn" onclick="downloadQR()">📥 ডাউনলোড করুন</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+    // কিউআর কোড তৈরি করার ফাংশন
+    var q = new QRCode(document.getElementById("qrcode"), {
+        width: 256,
+        height: 256,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    function gen() {
+        let val = document.getElementById("input").value;
+        q.makeCode(val || "SK KOBIR VAI");
+    }
+    
+    // ডাউনলোড করার ফাংশন
+    function downloadQR() {
+        const qrCanvas = document.querySelector('#qrcode canvas');
+        const qrImg = document.querySelector('#qrcode img');
+        
+        let dataUrl;
+        if (qrCanvas) {
+            dataUrl = qrCanvas.toDataURL("image/png");
+        } else if (qrImg) {
+            dataUrl = qrImg.src;
+        }
+
+        if (dataUrl) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'sk-kobir-qr.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            alert("আগে কিছু লিখুন ভাই!");
+        }
+    }
+
+    // শুরুতে একটি কোড দেখিয়ে রাখা
+    gen();
+</script>
+
+</body>
 </html>
